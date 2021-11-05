@@ -30,7 +30,6 @@ class QuestionsViewController: UIViewController {
         }
     }
     
-    
     // MARK: - Private Properties
     private let questions = Question.getQuestions()
     private var answersChosen: [Answer] = []

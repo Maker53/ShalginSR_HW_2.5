@@ -20,38 +20,34 @@ class ResultViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        animalTypeLabel.text = "Вы - " + String(getMainAnimalType().rawValue)
-        definitionLabel.text = getMainAnimalType().definition
-        
         navigationItem.hidesBackButton = true
+        getMainAnimalType()
     }
 }
 
 // MARK: - Private Methods
 extension ResultViewController {
-    private func getMainAnimalType() -> AnimalType {
-        var dogCount = 0
-        var catCount = 0
-        var rabbitCount = 0
-        var turtleCount = 0
+    private func getMainAnimalType() {
         
         var animalsWithPointsArray: [AnimalType: Int] = [:]
+        let animals = answersChosen.map { $0.type }
         
-        for answer in answersChosen {
-            switch answer.type {
-            case .dog: dogCount += 1
-                animalsWithPointsArray.updateValue(dogCount, forKey: .dog)
-            case .cat: catCount += 1
-                animalsWithPointsArray.updateValue(dogCount, forKey: .cat)
-            case .rabbit: rabbitCount += 1
-                animalsWithPointsArray.updateValue(dogCount, forKey: .rabbit)
-            case .turtle: turtleCount += 1
-                animalsWithPointsArray.updateValue(dogCount, forKey: .turtle)
+        for animal in animals {
+            if let animalTypeCount = animalsWithPointsArray[animal] {
+                animalsWithPointsArray.updateValue(animalTypeCount + 1, forKey: animal)
+            } else {
+                animalsWithPointsArray[animal] = 1
             }
         }
-
-        let sortedAnimalsArray = animalsWithPointsArray.sorted(by: {$0.value < $1.value})
         
-        return sortedAnimalsArray[0].key
+        let sortedAnimalsWithPointsArray = animalsWithPointsArray.sorted { $0.value > $1.value }
+        guard let mostFrequencyAnimal = sortedAnimalsWithPointsArray.first?.key else { return }
+        
+        updateUI(with: mostFrequencyAnimal)
+    }
+    
+    private func updateUI(with animal: AnimalType?) {
+        animalTypeLabel.text = "Вы - \(animal?.rawValue ?? "❗️")!"
+        definitionLabel.text = animal?.definition ?? ""
     }
 }
